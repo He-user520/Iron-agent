@@ -90,9 +90,12 @@ class TestNoopSandbox:
     @pytest.mark.asyncio
     async def test_execute_with_env(self):
         s = NoopSandbox()
+        # 复制当前环境变量，然后设置测试变量，确保子进程能正常启动
+        env = os.environ.copy()
+        env["TEST_VAR"] = "hello"
         result = await s.execute(
             [sys.executable, "-c", "import os; print(os.environ.get('TEST_VAR', ''))"],
-            env={"TEST_VAR": "hello", "PATH": os.environ.get("PATH", "")},
+            env=env,
         )
         assert result["returncode"] == 0
         assert "hello" in result["stdout"]
