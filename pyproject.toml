@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iron-embedded-cli"
+version = "4.0.0"  # V4.0: Git工具/MultiEdit/子Agent/观测性/tree-sitter引导
+description = "Iron — 嵌入式 AI 开发 Agent CLI v2"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [{name = "Iron Team"}]
+keywords = ["embedded", "ai", "cli", "agent", "mcu", "firmware"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Embedded Systems",
+]
+dependencies = [
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "prompt_toolkit>=3.0.0",
+    "pyyaml>=6.0",
+    "httpx>=0.25.0",
+    "anyio>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4.0", "pytest-asyncio>=0.21.0", "pytest-cov>=4.1.0", "ruff>=0.1.0"]
+mcp = ["mcp>=1.0.0"]
+serial = ["pyserial>=3.5"]
+lint = ["tree-sitter>=0.21.0", "tree-sitter-c>=0.21.0"]
+all = ["pyserial>=3.5", "tree-sitter>=0.21.0", "tree-sitter-c>=0.21.0", "mcp>=1.0.0"]
+
+[project.scripts]
+iron = "iron.cli.main:cli"
+
+[tool.setuptools.packages.find]
+include = ["iron*"]
+
+[tool.setuptools.package-data]
+iron = ["agent/agents/*.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

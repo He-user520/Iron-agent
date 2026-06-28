@@ -1,0 +1,39 @@
+# Iron 配置文件示例
+# 复制为 iron.yml 并填入真实值后使用
+# 注意：iron.yml 已被 .gitignore 忽略，不会提交到 git
+
+# LLM 配置
+llm:
+  backend: openai          # openai / anthropic / ollama / echo
+  model: gpt-4o
+  api_key: sk-your-api-key-here  # 建议用环境变量 IRON_API_KEY 替代
+  base_url: https://api.openai.com/v1
+  temperature: 0.3
+  max_tokens: 4096
+
+# 项目配置
+project:
+  mcu: stm32f407
+  build_system: platformio  # platformio / cmake / make / esp-idf / keil / gcc
+  project_dir: .
+
+# MCP 服务器配置（可选）
+# mcp:
+#   filesystem:
+#     type: local
+#     command: npx
+#     args:
+#       - -y
+#       - "@modelcontextprotocol/server-filesystem"
+#       - /path/to/allowed/dir
+#     env: {}
+#     enabled: true
+#     timeout: 5000
+#
+#   remote-server:
+#     type: sse               # sse 或 http
+#     url: https://example.com/sse
+#     headers:
+#       Authorization: "Bearer your-token"
+#     enabled: true
+#     timeout: 5000

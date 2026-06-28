@@ -1,0 +1,104 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 测试与缓存
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# Iron 配置（含 API Key，禁止提交）
+iron.yml
+iron.yaml
+iron.local.yml
+.iron/config.yml
+.iron/config.yaml
+.iron/secret.yml
+
+# Iron 运行时数据
+.iron/memory/
+.iron/sessions/
+.iron/tasks/
+.iron/logs/
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志与临时文件
+*.log
+*.tmp
+*.bak
+*.orig
+
+# 构建产物
+*.bin
+*.hex
+*.elf
+*.map
+build/
+pio-build/
+cmake-build-*/
+
+# 子项目（独立仓库，不包含在主仓库中）
+嵌入式-EmbedForge/
+嵌入式-embedguard/
+
+# Remotion 视频项目（独立项目，不包含在主仓库中）
+Remotion/
+
+# Python egg-info
+*.egg-info/
+iron_embedded_cli.egg-info/
+
+# Iron 运行时数据（本地状态，不提交）
+.iron/
+.iron-agent/
+
+# 内部报告文件（禁止提交）
+*报告*.md
+Iron深度测评报告*.md
+Iron产品*.md
+Iron回归测试报告.md
+测评.md
+修复完善计划.md
+
+# 临时文件和备份
+*.bak
+*.orig
+*.tmp
+
+# 规划文档中的 COORDINATOR 和 track 文档（内部协作用，可选提交）
+# docs/plans/  # 取消注释此行可忽略所有规划文档
+
+# 临时调试脚本（禁止提交）
+_*.py
+_*.txt
