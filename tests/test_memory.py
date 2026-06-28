@@ -111,8 +111,8 @@ class TestContextCompactor:
         mock_llm.generate = AsyncMock(return_value=mock_response)
 
         compactor = ContextCompactor(llm=mock_llm)
-        # 9 x 5000 Chinese chars = ~30k tokens > MAX_CONTEXT_TOKENS(30000)
-        messages = [{'role': 'user', 'content': '测' * 5000} for _ in range(9)]
+        # 15 x 5000 Chinese chars = ~50k tokens >> MAX_CONTEXT_TOKENS(30000)
+        messages = [{'role': 'user', 'content': '测' * 5000} for _ in range(15)]
         result = await compactor.compact_if_needed(messages, '')
         assert mock_llm.generate.called, 'LLM generate should be called when messages exceed limit'
         assert any(m.get('role') == 'system' for m in result)
@@ -128,7 +128,7 @@ class TestContextCompactor:
         mock_llm.generate = AsyncMock(return_value=mock_response)
 
         compactor = ContextCompactor(llm=mock_llm)
-        messages = [{'role': 'user', 'content': '测' * 5000} for _ in range(9)]
+        messages = [{'role': 'user', 'content': '测' * 5000} for _ in range(15)]
         await compactor.compact_if_needed(messages, '')
         assert compactor.last_summary == 'Test summary'
 

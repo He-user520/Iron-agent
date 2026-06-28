@@ -167,7 +167,7 @@ class TestCommandRiskEvaluation:
 class TestWriteRiskEvaluation:
     """文件写入风险评估"""
 
-    def _make_engine(self):
+    def _make_engine(self, project_dir: Path):
         from types import SimpleNamespace
         from iron.agent.engine import AgentEngine
         from iron.agent.prompt_builder import PromptBuilder
@@ -175,31 +175,39 @@ class TestWriteRiskEvaluation:
         from iron.skills.registry import SkillRegistry
 
         config = SimpleNamespace(
-            project=SimpleNamespace(project_dir="D:\\test_project", mcu="stm32f407", build_system="platformio"),
+            project=SimpleNamespace(project_dir=str(project_dir), mcu="stm32f407", build_system="platformio"),
             mcp={},
         )
         return AgentEngine(
             llm=EchoBackend(),
-            prompt_builder=PromptBuilder(Path("D:\\test_project")),
+            prompt_builder=PromptBuilder(project_dir),
             skills=SkillRegistry(),
             config=config,
         )
 
-    def test_in_project_safe(self):
-        engine = self._make_engine()
+    def test_in_project_safe(self, tmp_path):
+        project_dir = tmp_path / "test_project"
+        project_dir.mkdir()
+        engine = self._make_engine(project_dir)
         assert engine._evaluate_write_risk("src/main.c") == "safe"
         assert engine._evaluate_write_risk("lib/hello.c") == "safe"
 
-    def test_outside_project_dangerous(self):
-        engine = self._make_engine()
-        assert engine._evaluate_write_risk("C:\\Windows\\system32\\config.sys") == "dangerous"
-        assert engine._evaluate_write_risk("D:\\other_project\\evil.c") == "dangerous"
+    def test_outside_project_dangerous(self, tmp_path):
+        project_dir = tmp_path / "test_project"
+        project_dir.mkdir()
+        outside_dir = tmp_path / "other_project"
+        outside_dir.mkdir()
+        engine = self._make_engine(project_dir)
+        outside_file = outside_dir / "evil.c"
+        outside_file.write_text("")
+        assert engine._evaluate_write_risk(str(outside_file)) == "dangerous"
+        assert engine._evaluate_write_risk("../../etc/passwd") == "dangerous"
 
 
 class TestPathGuard:
     """路径越界守卫"""
 
-    def _make_engine(self):
+    def _make_engine(self, project_dir: Path):
         from types import SimpleNamespace
         from iron.agent.engine import AgentEngine
         from iron.agent.prompt_builder import PromptBuilder
@@ -207,29 +215,41 @@ class TestPathGuard:
         from iron.skills.registry import SkillRegistry
 
         config = SimpleNamespace(
-            project=SimpleNamespace(project_dir="D:\\safe_project", mcu="stm32f407", build_system="platformio"),
+            project=SimpleNamespace(project_dir=str(project_dir), mcu="stm32f407", build_system="platformio"),
             mcp={},
         )
         return AgentEngine(
             llm=EchoBackend(),
-            prompt_builder=PromptBuilder(Path("D:\\safe_project")),
+            prompt_builder=PromptBuilder(project_dir),
             skills=SkillRegistry(),
             config=config,
         )
 
-    def test_relative_path_resolved(self):
-        engine = self._make_engine()
+    def test_relative_path_resolved(self, tmp_path):
+        project_dir = tmp_path / "safe_project"
+        project_dir.mkdir()
+        engine = self._make_engine(project_dir)
         resolved = engine._resolve_project_path("src/app.c")
         assert resolved.is_absolute()
         assert "safe_project" in str(resolved)
 
-    def test_path_traversal_blocked(self):
-        engine = self._make_engine()
+    def test_path_traversal_blocked(self, tmp_path):
+        project_dir = tmp_path / "safe_project"
+        project_dir.mkdir()
+        outside_dir = tmp_path / "other_project"
+        outside_dir.mkdir()
+        engine = self._make_engine(project_dir)
+        outside_file = outside_dir / "evil.c"
+        outside_file.write_text("")
         with pytest.raises(ValueError, match="路径越界"):
-            engine._resolve_project_path("D:\\other_project\\evil.c")
+            engine._resolve_project_path(str(outside_file))
+        with pytest.raises(ValueError, match="路径越界"):
+            engine._resolve_project_path("../../etc/passwd")
 
-    def test_windows_reserved_names_blocked(self):
-        engine = self._make_engine()
+    def test_windows_reserved_names_blocked(self, tmp_path):
+        project_dir = tmp_path / "safe_project"
+        project_dir.mkdir()
+        engine = self._make_engine(project_dir)
         with pytest.raises(ValueError, match="Windows 保留设备名"):
             engine._resolve_project_path("CON.txt")
         with pytest.raises(ValueError, match="Windows 保留设备名"):
